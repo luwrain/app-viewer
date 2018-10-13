@@ -73,11 +73,11 @@ class App implements Application, Pdf.Listener
 		    NullCheck.notNull(event, "event");
 		    if (event.isSpecial() && !event.isModified())
 			switch(event.getSpecial())
-		    {
-		    case ESCAPE:
-			closeApp();
-			return true;
-		    }
+			{
+			case ESCAPE:
+			    closeApp();
+			    return true;
+			}
 		    return super.onInputEvent(event);
 		}
 		@Override public boolean onSystemEvent(EnvironmentEvent event)
@@ -90,11 +90,11 @@ class App implements Application, Pdf.Listener
 		    case CLOSE:
 			closeApp();
 			return true;
-								    default:
+		    default:
 			return super.onSystemEvent(event);
 		    }
 		}
-				@Override public String getAreaName()
+		@Override public String getAreaName()
 		{
 		    return arg != null?arg.getName():strings.appName();
 		}
@@ -104,19 +104,19 @@ class App implements Application, Pdf.Listener
     private void  loadFile(File file)
     {
 	NullCheck.notNull(file, "file");
-							    try {
-								this.pdf = luwrain.createPdfPreview(this, file);
-			    				}
-				catch(Exception e)
-				{
-				    this.text = new String[]{
-					"",
-					"ERROR:",
-					e.getClass().getName(),
-					e.getMessage(),
-				    };
-				    luwrain.onAreaNewContent(area);
-				}
+	try {
+	    this.pdf = luwrain.createPdfPreview(this, file);
+	}
+	catch(Exception e)
+	{
+	    this.text = new String[]{
+		"",
+		"ERROR:",
+		e.getClass().getName(),
+		e.getMessage(),
+	    };
+	    luwrain.onAreaNewContent(area);
+	}
     }
 
     @Override public boolean onInputEvent(KeyboardEvent event)
