@@ -18,11 +18,13 @@ package org.luwrain.app.viewer;
 
 import java.util.*;
 import java.io.*;
+import java.net.*;
 
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
 import org.luwrain.interaction.graphical.*;
+import org.luwrain.util.*;
 
 class App implements Application, Pdf.Listener
 {
@@ -30,8 +32,9 @@ class App implements Application, Pdf.Listener
     private Strings strings = null;
     private NavigationArea area = null;
 
-    private final File arg;
+    private final String arg;
     private Pdf pdf = null;
+    private URL url = null;
     private String[] text = new String[0];
 
     App()
@@ -39,7 +42,7 @@ class App implements Application, Pdf.Listener
 	arg = null;
     }
 
-    App(File arg)
+    App(String arg)
     {
 	NullCheck.notNull(arg, "arg");
 	this.arg = arg;
@@ -54,6 +57,8 @@ class App implements Application, Pdf.Listener
 	this.strings = (Strings)o;
 	this.luwrain = luwrain;
 	createArea();
+	if (arg != null && !arg.isEmpty())
+	    load(arg);
 	return new InitResult();
     }
 
@@ -96,16 +101,20 @@ class App implements Application, Pdf.Listener
 		}
 		@Override public String getAreaName()
 		{
-		    return arg != null?arg.getName():strings.appName();
+		    if (url == null)
+			return strings.appName();
+		    final File file = Urls.toFile(url);
+		    return file.getName();
 		}
 	    };
     }
 
-    private void  loadFile(File file)
+    private void  load(String file)
     {
-	NullCheck.notNull(file, "file");
+	NullCheck.notEmpty(file, "file");
 	try {
-	    this.pdf = luwrain.createPdfPreview(this, file);
+	    		this.url = new URL(file);
+			this.pdf = luwrain.createPdfPreview(this, Urls.toFile(url));
 	}
 	catch(Exception e)
 	{
@@ -119,10 +128,21 @@ class App implements Application, Pdf.Listener
 	}
     }
 
-    @Override public boolean onInputEvent(KeyboardEvent event)
+    @Override public void onInputEvent(KeyboardEvent event)
     {
 	NullCheck.notNull(event, "event");
-	return false;
+	if (event.isSpecial() && !event.isModified())
+	    switch(event.getSpecial())
+	    {
+	    case ESCAPE:
+		if (pdf != null)
+		{
+		    pdf.close();
+		    pdf = null;
+		}
+		return;
+	    }
+	luwrain.playSound(Sounds.EVENT_NOT_PROCESSED);
     }
 
     @Override public void closeApp()

@@ -17,7 +17,6 @@
 package org.luwrain.app.viewer;
 
 import java.util.*;
-import java.io.*;
 
 import org.luwrain.base.*;
 import org.luwrain.core.*;
@@ -56,7 +55,7 @@ public final class Extension extends org.luwrain.core.extensions.EmptyExtension
 			return new Application[]{new App()};
 		    final List<Application> v = new LinkedList();
 		    for(String s: args)
-			v.add(new App(new File(s)));
+			v.add(new App(s));
 		    if (v.isEmpty())
 			return new Application[]{new App()};
 		    return v.toArray(new Application[v.size()]);
