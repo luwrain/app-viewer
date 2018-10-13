@@ -22,13 +22,17 @@ import java.io.*;
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
+import org.luwrain.interaction.graphical.*;
 
-class App implements Application
+class App implements Application, Pdf.Listener
 {
     private Luwrain luwrain = null;
     private Strings strings = null;
     private NavigationArea area = null;
+
     private final File arg;
+    private Pdf pdf = null;
+    private String[] text = new String[0];
 
     App()
     {
@@ -58,11 +62,11 @@ class App implements Application
 	this.area = new NavigationArea(new DefaultControlEnvironment(luwrain)) {
 		@Override public String getLine(int index)
 		{
-		    return "";
+		    return index < text.length?text[index]:"";
 		}
 		@Override public int getLineCount()
 		{
-		    return 1;
+		    return text.length > 0?text.length:1;
 		}
 		@Override public boolean onInputEvent(KeyboardEvent event)
 		{
@@ -86,28 +90,39 @@ class App implements Application
 		    case CLOSE:
 			closeApp();
 			return true;
-			/*
-						{
-						    try {
-			    luwrain.createPdfPreview((ev)->{
-				    return false;
-				}, new File("/tmp/pr.pdf"));
-			    				}
-				catch(Exception e)
-				{
-				    luwrain.crash(e);
-				}
-						    			    return  true;
-			*/
 								    default:
 			return super.onSystemEvent(event);
 		    }
 		}
-		@Override public String getAreaName()
+				@Override public String getAreaName()
 		{
-		    return arg.getName();
+		    return arg != null?arg.getName():strings.appName();
 		}
 	    };
+    }
+
+    private void  loadFile(File file)
+    {
+	NullCheck.notNull(file, "file");
+							    try {
+								this.pdf = luwrain.createPdfPreview(this, file);
+			    				}
+				catch(Exception e)
+				{
+				    this.text = new String[]{
+					"",
+					"ERROR:",
+					e.getClass().getName(),
+					e.getMessage(),
+				    };
+				    luwrain.onAreaNewContent(area);
+				}
+    }
+
+    @Override public boolean onInputEvent(KeyboardEvent event)
+    {
+	NullCheck.notNull(event, "event");
+	return false;
     }
 
     @Override public void closeApp()
