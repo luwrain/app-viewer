@@ -134,16 +134,46 @@ class App implements Application, Pdf.Listener
 	if (event.isSpecial() && !event.isModified())
 	    switch(event.getSpecial())
 	    {
+	    case PAGE_DOWN:
+		if (pdf == null)
+		    return;
+		{
+		    final int nextPage = pdf.getCurrentPageNum() + 1;
+		    if (nextPage >= pdf.getPageCount())
+		    {
+			luwrain.playSound(Sounds.EVENT_NOT_PROCESSED);
+			return;
+		    }
+		    pdf.showPage(nextPage);
+		    luwrain.message("Страница " + (nextPage + 1) + " из " + pdf.getPageCount());//FIXME:
+												}
+												return;
+												case PAGE_UP:
+												if (pdf == null)
+												return;
+												{
+												final int prevPage = pdf.getCurrentPageNum() - 1;
+												if (prevPage < 0)
+												{
+												luwrain.playSound(Sounds.EVENT_NOT_PROCESSED);
+												return;
+												}
+												pdf.showPage(prevPage);
+												luwrain.message("Страница " + (prevPage + 1) + " из " + pdf.getPageCount());//FIXME:
+												}
+												return;
 	    case ESCAPE:
 		if (pdf != null)
 		{
 		    pdf.close();
 		    pdf = null;
+		    closeApp();
 		}
-		return;
-	    }
-	luwrain.playSound(Sounds.EVENT_NOT_PROCESSED);
-    }
+												return;
+												}
+												luwrain.message(event.toString());
+												//	luwrain.playSound(Sounds.EVENT_NOT_PROCESSED);
+												}
 
     @Override public void closeApp()
     {
@@ -157,6 +187,9 @@ class App implements Application, Pdf.Listener
 
     @Override public String getAppName()
     {
-	return strings.appName();
+			    if (url == null)
+			return strings.appName();
+		    final File file = Urls.toFile(url);
+		    return file.getName();
     }
 }
