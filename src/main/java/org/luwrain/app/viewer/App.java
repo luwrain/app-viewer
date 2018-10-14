@@ -29,7 +29,8 @@ import org.luwrain.util.*;
 class App implements Application, Pdf.Listener
 {
     static private final float SCALE_STEP = 0.2f;
-    
+        static private final double OFFSET_STEP = 200.0;
+
     private Luwrain luwrain = null;
     private Strings strings = null;
     private NavigationArea area = null;
@@ -133,38 +134,33 @@ class App implements Application, Pdf.Listener
     @Override public void onInputEvent(KeyboardEvent event)
     {
 	NullCheck.notNull(event, "event");
-
-		if (!event.isSpecial() && !event.isModified())
-		    switch(event.getChar())
+	if (!event.isSpecial() && !event.isModified())
+	    switch(event.getChar())
+	    {
+	    case '=':
+		{
+		    if (pdf == null)
+			return;
+		    final float newScale = pdf.getScale() + SCALE_STEP;
+		    pdf.setScale(newScale);
+		    luwrain.message("Увеличение");
+		    return;
+		}
+	    case '-':
+		{
+		    if (pdf == null)
+			return;
+		    final float newScale = pdf.getScale() - SCALE_STEP;
+		    if (newScale < 0.5)
 		    {
-		    case '=':
-			{
-			    if (pdf == null)
-				return;
-			    final float newScale = pdf.getScale() + SCALE_STEP;
-			    pdf.setScale(newScale);
-			    luwrain.message("Увеличение");
-			    return;
-			}
-
-					    case '-':
-			{
-			    if (pdf == null)
-				return;
-			    final float newScale = pdf.getScale() - SCALE_STEP;
-			    if (newScale < 0.5)
-			    {
-				luwrain.playSound(Sounds.EVENT_NOT_PROCESSED);
-				return;
-			    }
-			    pdf.setScale(newScale);
-			    luwrain.message("Уменьшение");
-			    return;
-			}
-
-			
+			luwrain.playSound(Sounds.EVENT_NOT_PROCESSED);
+			return;
 		    }
-		    
+		    pdf.setScale(newScale);
+		    luwrain.message("Уменьшение");
+		    return;
+		}
+	    }
 	if (event.isSpecial() && !event.isModified())
 	    switch(event.getSpecial())
 	    {
@@ -196,17 +192,44 @@ class App implements Application, Pdf.Listener
 												luwrain.message("Страница " + (prevPage + 1) + " из " + pdf.getPageCount());//FIXME:
 												}
 												return;
-	    case ESCAPE:
-		if (pdf != null)
-		{
-		    pdf.close();
-		    pdf = null;
-		    closeApp();
-		}
+												case ARROW_RIGHT:
+												if (pdf == null)
+												return;
+												if (pdf.setOffsetX(pdf.getOffsetX() + OFFSET_STEP))
+												luwrain.message("Сдвиг вправо"); else //FIXME:
+												luwrain.playSound(Sounds.EVENT_NOT_PROCESSED);
+												return;
+												case ARROW_LEFT:
+												if (pdf == null)
+												return;
+												if (pdf.setOffsetX(pdf.getOffsetX() - OFFSET_STEP))
+												luwrain.message("Сдвиг влево"); else//FIXME:
+												luwrain.playSound(Sounds.EVENT_NOT_PROCESSED);
+												return;
+												case ARROW_UP:
+												if (pdf == null)
+												return;
+												if (pdf.setOffsetY(pdf.getOffsetY() - OFFSET_STEP))
+												luwrain.message("Сдвиг вверх"); else //FIXME:
+												luwrain.playSound(Sounds.EVENT_NOT_PROCESSED);
+												return;
+												case ARROW_DOWN:
+												if (pdf == null)
+												return;
+												if (pdf.setOffsetY(pdf.getOffsetY() + OFFSET_STEP))
+												luwrain.message("Сдвиг вниз"); else //FIXME:
+												luwrain.playSound(Sounds.EVENT_NOT_PROCESSED);
+												return;
+												case ESCAPE:
+												if (pdf != null)
+												{
+												pdf.close();
+												pdf = null;
+												closeApp();
+												}
 												return;
 												}
-												luwrain.message(event.toString());
-												//	luwrain.playSound(Sounds.EVENT_NOT_PROCESSED);
+												luwrain.playSound(Sounds.EVENT_NOT_PROCESSED);
 												}
 
     @Override public void closeApp()
