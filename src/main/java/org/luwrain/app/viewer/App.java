@@ -28,6 +28,8 @@ import org.luwrain.util.*;
 
 class App implements Application, Pdf.Listener
 {
+    static private final float SCALE_STEP = 0.2f;
+    
     private Luwrain luwrain = null;
     private Strings strings = null;
     private NavigationArea area = null;
@@ -131,6 +133,38 @@ class App implements Application, Pdf.Listener
     @Override public void onInputEvent(KeyboardEvent event)
     {
 	NullCheck.notNull(event, "event");
+
+		if (!event.isSpecial() && !event.isModified())
+		    switch(event.getChar())
+		    {
+		    case '=':
+			{
+			    if (pdf == null)
+				return;
+			    final float newScale = pdf.getScale() + SCALE_STEP;
+			    pdf.setScale(newScale);
+			    luwrain.message("Увеличение");
+			    return;
+			}
+
+					    case '-':
+			{
+			    if (pdf == null)
+				return;
+			    final float newScale = pdf.getScale() - SCALE_STEP;
+			    if (newScale < 0.5)
+			    {
+				luwrain.playSound(Sounds.EVENT_NOT_PROCESSED);
+				return;
+			    }
+			    pdf.setScale(newScale);
+			    luwrain.message("Уменьшение");
+			    return;
+			}
+
+			
+		    }
+		    
 	if (event.isSpecial() && !event.isModified())
 	    switch(event.getSpecial())
 	    {
