@@ -67,7 +67,7 @@ class App implements Application, Pdf.Listener
 
     private void createArea()
     {
-	this.area = new NavigationArea(new DefaultControlEnvironment(luwrain)) {
+	this.area = new NavigationArea(new DefaultControlContext(luwrain)) {
 		@Override public String getLine(int index)
 		{
 		    return index < text.length?text[index]:"";
