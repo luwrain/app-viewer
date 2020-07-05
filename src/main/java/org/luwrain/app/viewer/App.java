@@ -76,7 +76,7 @@ class App implements Application, Pdf.Listener
 		{
 		    return text.length > 0?text.length:1;
 		}
-		@Override public boolean onInputEvent(KeyboardEvent event)
+		@Override public boolean onInputEvent(InputEvent event)
 		{
 		    NullCheck.notNull(event, "event");
 		    if (event.isSpecial() && !event.isModified())
@@ -131,7 +131,7 @@ class App implements Application, Pdf.Listener
 	}
     }
 
-    @Override public void onInputEvent(KeyboardEvent event)
+    @Override public void onInputEvent(InputEvent event)
     {
 	NullCheck.notNull(event, "event");
 	if (!event.isSpecial() && !event.isModified())
