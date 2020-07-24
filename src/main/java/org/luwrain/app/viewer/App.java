@@ -23,7 +23,7 @@ import java.net.*;
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
-import org.luwrain.interaction.graphical.*;
+import org.luwrain.graphical.*;
 import org.luwrain.util.*;
 
 class App implements Application, Pdf.Listener
@@ -117,7 +117,7 @@ class App implements Application, Pdf.Listener
 	NullCheck.notEmpty(file, "file");
 	try {
 	    		this.url = new URL(file);
-			this.pdf = luwrain.createPdfPreview(this, Urls.toFile(url));
+			this.pdf = null;//luwrain.createPdfPreview(this, Urls.toFile(url));
 	}
 	catch(Exception e)
 	{
