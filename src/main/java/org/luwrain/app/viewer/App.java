@@ -23,99 +23,44 @@ import java.net.*;
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
-import org.luwrain.graphical.*;
+import org.luwrain.app.base.*;
 import org.luwrain.util.*;
 
-class App implements Application
+class App extends AppBase<Strings>
 {
-
-    private Luwrain luwrain = null;
-    private Strings strings = null;
-    private NavigationArea area = null;
-
     private final String arg;
-    private Pdf pdf = null;
     private URL url = null;
     private String[] text = new String[0];
 
     App()
     {
-	arg = null;
+	this(null);
     }
 
     App(String arg)
     {
-	NullCheck.notNull(arg, "arg");
+	super(Strings.NAME, Strings.class);
 	this.arg = arg;
     }
 
-    @Override public InitResult onLaunchApp(Luwrain luwrain)
+    @Override protected boolean onAppInit()
     {
-	NullCheck.notNull(luwrain, "luwrain");
-	final Object o = luwrain.i18n().getStrings(Strings.NAME);
-	if (o == null || !(o instanceof Strings))
-	    return new InitResult(InitResult.Type.NO_STRINGS_OBJ, Strings.NAME);
-	this.strings = (Strings)o;
-	this.luwrain = luwrain;
-	createArea();
 	if (arg != null && !arg.isEmpty())
 	    load(arg);
-	return new InitResult();
+	return true;
     }
 
-    private void createArea()
+    @Override public AreaLayout getDefaultAreaLayout()
     {
-	this.area = new NavigationArea(new DefaultControlContext(luwrain)) {
-		@Override public String getLine(int index)
-		{
-		    return index < text.length?text[index]:"";
-		}
-		@Override public int getLineCount()
-		{
-		    return text.length > 0?text.length:1;
-		}
-		@Override public boolean onInputEvent(InputEvent event)
-		{
-		    NullCheck.notNull(event, "event");
-		    if (event.isSpecial() && !event.isModified())
-			switch(event.getSpecial())
-			{
-			case ESCAPE:
-			    closeApp();
-			    return true;
-			}
-		    return super.onInputEvent(event);
-		}
-		@Override public boolean onSystemEvent(SystemEvent event)
-		{
-		    NullCheck.notNull(event, "event");
-		    if (event.getType() != SystemEvent.Type.REGULAR)
-			return super.onSystemEvent(event);
-		    switch(event.getCode())
-		    {
-		    case CLOSE:
-			closeApp();
-			return true;
-		    default:
-			return super.onSystemEvent(event);
-		    }
-		}
-		@Override public String getAreaName()
-		{
-		    if (url == null)
-			return strings.appName();
-		    final File file = Urls.toFile(url);
-		    return file.getName();
-		}
-	    };
+	return null;
     }
 
     private void  load(String file)
     {
+	/*
 	NullCheck.notEmpty(file, "file");
 	try {
 	    		this.url = new URL(file);
-			this.pdf = null;//luwrain.createPdfPreview(this, Urls.toFile(url));
 	}
 	catch(Exception e)
 	{
@@ -127,23 +72,6 @@ class App implements Application
 	    };
 	    luwrain.onAreaNewContent(area);
 	}
-    }
-
-    @Override public void closeApp()
-    {
-	luwrain.closeApp();
-    }
-
-    @Override public AreaLayout getAreaLayout()
-    {
-	return new AreaLayout(area);
-    }
-
-    @Override public String getAppName()
-    {
-			    if (url == null)
-			return strings.appName();
-		    final File file = Urls.toFile(url);
-		    return file.getName();
+	*/
     }
 }
