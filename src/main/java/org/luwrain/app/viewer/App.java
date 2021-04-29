@@ -43,15 +43,10 @@ class App extends AppBase<Strings>
 	this.arg = arg;
     }
 
-    @Override protected boolean onAppInit()
+    @Override protected AreaLayout onAppInit()
     {
 	if (arg != null && !arg.isEmpty())
 	    load(arg);
-	return true;
-    }
-
-    @Override public AreaLayout getDefaultAreaLayout()
-    {
 	return null;
     }
 
