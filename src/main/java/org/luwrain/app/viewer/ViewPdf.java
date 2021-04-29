@@ -40,14 +40,15 @@ import org.luwrain.base.*;
 import org.luwrain.core.events.*;
 import org.luwrain.graphical.javafx.*;
 
-final class ViewPdf
+abstract class ViewPdf
 {
     static final String LOG_COMPONENT = "pdf";
+        static private final float SCALE_STEP = 0.2f;
+        static private final double OFFSET_STEP = 200.0;
+
 
     private final Luwrain luwrain;
     private ResizableCanvas canvas = null;
-    //    private final org.luwrain.graphical.Pdf.Listener listener;
-
         private final PDDocument doc;
     private final PDFRenderer rend;
     private Image image = null;
@@ -65,6 +66,17 @@ final class ViewPdf
 	this.rend = new PDFRenderer(doc);
 	Log.debug(LOG_COMPONENT, "PDF renderer created");
     }
+
+        abstract void inaccessible();
+    abstract void announcePage(int pageNum, int pageCount);
+    abstract void announceMoveLeft();
+        abstract void announceMoveRight();
+    abstract void announceMoveUp();
+        abstract void announceMoveDown();
+    abstract void announceZoomIn();
+    abstract void announceZoomOut();
+    
+
 
     public void show()
     {
@@ -87,7 +99,80 @@ final class ViewPdf
 	    });
     }
 
-    private void drawInitial()
+
+    private void nextPage()
+    {
+		    final int nextPage = getCurrentPageNum() + 1;
+		    if (nextPage >= getPageCount())
+		    {
+			inaccessible();
+			return;
+		    }
+		    showPage(nextPage);
+		    announcePage(nextPage + 1, getPageCount());
+    }
+
+    private void prevPage()
+    {
+												final int prevPage = getCurrentPageNum() - 1;
+												if (prevPage < 0)
+												{
+												    inaccessible();
+												return;
+												}
+												showPage(prevPage);
+												announcePage(prevPage + 1, getPageCount());
+												}
+
+    private void moveRight()
+    {
+												if (setOffsetX(getOffsetX() + OFFSET_STEP))
+												    announceMoveRight(); else
+												    inaccessible();
+    }
+
+    private void moveLeft()
+    {
+												if (setOffsetX(getOffsetX() - OFFSET_STEP))
+												    announceMoveLeft(); else
+												    inaccessible();
+    }
+
+    private void moveUp()
+    {
+													if (setOffsetY(getOffsetY() - OFFSET_STEP))
+													    announceMoveUp(); else
+													    inaccessible();
+												return;
+    }
+
+    private void moveDown()
+    {
+													if (setOffsetY(getOffsetY() + OFFSET_STEP))
+													    announceMoveDown(); else
+													    inaccessible();
+    }
+
+    private void zoomIn()
+    {
+		    final float newScale = getScale() + SCALE_STEP;
+setScale(newScale);
+announceZoomIn();
+    }
+
+    private void zoomOut()
+    {
+    		    final float newScale = getScale() - SCALE_STEP;
+		    if (newScale < 0.5)
+		    {
+			inaccessible();
+			return;
+		    }
+		    setScale(newScale);
+		    announceZoomOut();
+    }
+
+        private void drawInitial()
     {
 	this.offsetX = 0;
 	this.offsetY = 0;
@@ -118,27 +203,27 @@ final class ViewPdf
 	return false;
     }
 
-    public int getPageCount()
+    int getPageCount()
     {
 	return doc.getNumberOfPages();
     }
 
-    public int getCurrentPageNum()
+    private int getCurrentPageNum()
     {
 	return pageNum;
     }
 
-    public double getOffsetX()
+    double getOffsetX()
     {
 	return offsetX;
     }
 
-        public double getOffsetY()
+        double getOffsetY()
     {
 	return offsetY;
     }
 
-        public boolean setOffsetX(double value)
+        boolean setOffsetX(double value)
     {
 	if (value < 0)
 	    return false;
@@ -153,7 +238,7 @@ final class ViewPdf
 			    return true;
     }
 
-            public boolean setOffsetY(double value)
+            boolean setOffsetY(double value)
     {
 		if (value < 0)
 	    return false;
@@ -168,12 +253,12 @@ final class ViewPdf
 			    return true;
     }
 
-    public float getScale()
+    float getScale()
     {
 	return scale;
     }
 
-    public void setScale(float value)
+private void setScale(float value)
     {
 	if (value < 0.5)
 	    throw new IllegalArgumentException("Too small scale");
@@ -183,10 +268,10 @@ final class ViewPdf
 		draw();
 	    });
     }
-    
+
     private void draw()
     {
-	//	InvalidThreadException.checkThread("PdfPreview.draw()");
+	FxThread.ensure();
 	if (image == null || canvas == null)
 	    return;
 	final double imageWidth = image.getWidth();
@@ -203,11 +288,9 @@ final class ViewPdf
 		     horizFrag.to, vertFrag.to, horizFrag.size, vertFrag.size);
     }
 
-    
-
     private Image makeImage(int pageNum, float scale)
     {
-	//	InvalidThreadException.checkThread("PdfPreview.makeImage");
+	FxThread.ensure();
 	        final BufferedImage pageImage;
         try {
             pageImage = rend.renderImage(pageNum, scale);
@@ -225,10 +308,11 @@ return image;
     private void onKey(KeyEvent event)
     {
 	NullCheck.notNull(event, "event");
+	FxThread.ensure();
 	switch(event.getCode())
 	{
 	case ESCAPE:
-	    //	    listener.onInputEvent(new InputEvent(InputEvent.Special.ESCAPE));
+	    close();
 	    break;
 	case PAGE_DOWN:
 	    //	    listener.onInputEvent(new InputEvent(InputEvent.Special.PAGE_DOWN));
@@ -272,7 +356,6 @@ return image;
 	final double from;
 	final double to;
 	final double size;
-
 	Fragment(double from, double to, double size)
 	{
 	    this.from = from;
