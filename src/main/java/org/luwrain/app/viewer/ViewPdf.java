@@ -38,7 +38,7 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 import org.luwrain.core.*;
 import org.luwrain.base.*;
 import org.luwrain.core.events.*;
-import org.luwrain.graphical.javafx.*;
+import org.luwrain.graphical.*;
 
 abstract class ViewPdf
 {
@@ -80,21 +80,21 @@ abstract class ViewPdf
 
     public void show()
     {
-	FxThread.runInFxThreadSync(()->{
+	luwrain.showGraphical((control)->{
 	try {
 	    this.canvas = new ResizableCanvas();
 	    this.canvas.setOnKeyPressed((event)->onKey(event));
-	    this.canvas.setVisible(false);
-	    luwrain.showGraphical(canvas);
-	    canvas.setVisible(true);
-	    this.canvas.requestFocus();
-	    drawInitial();
+	    this.canvas.setVisible(true);
+	    	    this.canvas.requestFocus();
+		    	    drawInitial();
+	    return canvas;
 	}
 	catch(Throwable e)
 	{
 	    Log.error(LOG_COMPONENT, "unable to initialize the PDF preview:" + e.getClass().getName() + ":" + e.getMessage());
 	    e.printStackTrace();
 	    this.canvas = null;
+	    return null;
 	}
 	    });
     }
@@ -186,7 +186,7 @@ announceZoomIn();
 
     public void close()
     {
-	FxThread.runInFxThreadSync(()->{
+	FxThread.runSync(()->{
 		//		interaction.closeCanvas(this.canvas);
 		//		interaction.disableGraphicalMode();
 	    });
@@ -196,7 +196,7 @@ announceZoomIn();
     {
 	if (index < 0 || index >= getPageCount())
 	    return false;
-	FxThread.runInFxThreadSync(()->{
+	FxThread.runSync(()->{
 	this.pageNum = index;
 	drawInitial();
 	    });
@@ -231,7 +231,7 @@ announceZoomIn();
 	    return false;
 	if (image.getWidth() - value < canvas.getWidth())
 	    return false;
-			FxThread.runInFxThreadSync(()->{
+			FxThread.runSync(()->{
 				this.offsetX = value;
 				draw();
 			    });
@@ -246,7 +246,7 @@ announceZoomIn();
 	    return false;
 	if (image.getHeight() - value < canvas.getHeight())
 	    return false;
-			FxThread.runInFxThreadSync(()->{
+			FxThread.runSync(()->{
 				this.offsetY = value;
 				draw();
 			    });
@@ -262,7 +262,7 @@ private void setScale(float value)
     {
 	if (value < 0.5)
 	    throw new IllegalArgumentException("Too small scale");
-	FxThread.runInFxThreadSync(()->{
+	FxThread.runSync(()->{
 		this.scale = value;
 		this.image = makeImage(pageNum, scale);
 		draw();
