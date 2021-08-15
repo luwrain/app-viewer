@@ -36,7 +36,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 
 import org.luwrain.core.*;
-import org.luwrain.base.*;
 import org.luwrain.core.events.*;
 import org.luwrain.graphical.*;
 
