@@ -26,7 +26,7 @@ import java.awt.image.BufferedImage;
 import javafx.scene.paint.Color;
 import javafx.scene.image.Image;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.embed.swing.SwingFXUtils;
+//import javafx.embed.swing.SwingFXUtils;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker.State;
@@ -193,7 +193,7 @@ announceZoomIn();
 	    Log.error(LOG_COMPONENT, "unable to render a PDf page:" + e.getClass().getName() + ":" + e.getMessage());
 	    return null;
         }
-final Image image = SwingFXUtils.toFXImage(pageImage, null);
+	final Image image = null;//SwingFXUtils.toFXImage(pageImage, null);
 Log.debug(LOG_COMPONENT, "image " + String.format("%.2f", image.getWidth()) + "x" + String.format("%.2f", image.getHeight()));
 return image;
     }

@@ -32,11 +32,7 @@ class App extends AppBase<Strings>
     private URL url = null;
     private String[] text = new String[0];
 
-    App()
-    {
-	this(null);
-    }
-
+    App() { this(null); }
     App(String arg)
     {
 	super(Strings.NAME, Strings.class);
