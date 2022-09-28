@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2021 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
    Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
@@ -26,7 +26,7 @@ import java.awt.image.BufferedImage;
 import javafx.scene.paint.Color;
 import javafx.scene.image.Image;
 import javafx.scene.canvas.GraphicsContext;
-//import javafx.embed.swing.SwingFXUtils;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker.State;
@@ -59,10 +59,10 @@ abstract class ViewPdf
     private double offsetX = 0;
     private double offsetY = 0;
 
-    ViewPdf(Luwrain luwrain)
+    ViewPdf(Luwrain luwrain) throws IOException
     {
 	this.luwrain = luwrain;
-	this.doc = null;//PDDocument.load(file);
+	this.doc = PDDocument.load(new File("/tmp/proba.pdf"));
 	this.rend = new PDFRenderer(doc);
 	Log.debug(LOG_COMPONENT, "PDF renderer created");
     }
@@ -76,7 +76,7 @@ abstract class ViewPdf
     abstract void announceZoomIn();
     abstract void announceZoomOut();
 
-    public void show()
+    void show()
     {
 	luwrain.showGraphical((control)->{
 	try {
@@ -89,10 +89,7 @@ abstract class ViewPdf
 	}
 	catch(Throwable e)
 	{
-	    Log.error(LOG_COMPONENT, "unable to initialize the PDF preview:" + e.getClass().getName() + ":" + e.getMessage());
-	    e.printStackTrace();
-	    this.canvas = null;
-	    return null;
+	    throw new RuntimeException(e);
 	}
 	    });
     }
@@ -297,7 +294,7 @@ private void setScale(float value)
 	    Log.error(LOG_COMPONENT, "unable to render a PDf page:" + e.getClass().getName() + ":" + e.getMessage());
 	    return null;
         }
-	final Image image = null;//SwingFXUtils.toFXImage(pageImage, null);
+	final Image image = SwingFXUtils.toFXImage(pageImage, null);
 Log.debug(LOG_COMPONENT, "image " + String.format("%.2f", image.getWidth()) + "x" + String.format("%.2f", image.getHeight()));
 return image;
     }

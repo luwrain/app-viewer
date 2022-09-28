@@ -43,10 +43,12 @@ public class App extends AppBase<Strings>
 	this.arg = arg;
     }
 
-    @Override protected AreaLayout onAppInit()
+    @Override protected AreaLayout onAppInit() throws IOException
     {
 	if (arg != null && !arg.isEmpty())
 	    load(arg);
+	final ViewPdf viewPdf = createPdfView();
+	viewPdf.show();
 	this.mainLayout = new MainLayout(this);
 	return mainLayout.getAreaLayout();
     }
@@ -71,7 +73,7 @@ public class App extends AppBase<Strings>
 	*/
     }
 
-    private ViewPdf createPdfView()
+    private ViewPdf createPdfView() throws IOException
     {
 	return new ViewPdf(getLuwrain()){
 	    @Override void inaccessible() {  getLuwrain().playSound(Sounds.ERROR); }
