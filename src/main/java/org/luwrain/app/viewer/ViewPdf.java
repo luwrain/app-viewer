@@ -39,12 +39,14 @@ import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.graphical.*;
 
+import static org.luwrain.app.viewer.App.*;
+
 abstract class ViewPdf
 {
-    static final String LOG_COMPONENT = "pdf";
-        static private final float SCALE_STEP = 0.2f;
-        static private final double OFFSET_STEP = 200.0;
-
+        static private final float
+	    SCALE_STEP = 0.2f;
+    static private final double
+	OFFSET_STEP = 200.0;
 
     private final Luwrain luwrain;
     private ResizableCanvas canvas = null;
@@ -59,7 +61,6 @@ abstract class ViewPdf
 
     ViewPdf(Luwrain luwrain)
     {
-	NullCheck.notNull(luwrain, "luwrain");
 	this.luwrain = luwrain;
 	this.doc = null;//PDDocument.load(file);
 	this.rend = new PDFRenderer(doc);
@@ -74,8 +75,6 @@ abstract class ViewPdf
         abstract void announceMoveDown();
     abstract void announceZoomIn();
     abstract void announceZoomOut();
-    
-
 
     public void show()
     {
@@ -97,7 +96,6 @@ abstract class ViewPdf
 	}
 	    });
     }
-
 
     private void nextPage()
     {

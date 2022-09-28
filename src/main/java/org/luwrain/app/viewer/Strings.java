@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2021 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -18,7 +18,8 @@ package org.luwrain.app.viewer;
 
 public interface Strings
 {
-    static final String NAME = "luwrain.viewer";
+    static final String
+	NAME = "luwrain.viewer";
 
     String appName();
     }

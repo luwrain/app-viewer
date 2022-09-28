@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2021 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -26,14 +26,18 @@ import org.luwrain.controls.*;
 import org.luwrain.app.base.*;
 import org.luwrain.util.*;
 
-class App extends AppBase<Strings>
+public class App extends AppBase<Strings>
 {
+    static final String
+	LOG_COMPONENT = "viewer";
+
     private final String arg;
     private URL url = null;
     private String[] text = new String[0];
+    private MainLayout mainLayout = null;
 
-    App() { this(null); }
-    App(String arg)
+    public App() { this(null); }
+    public App(String arg)
     {
 	super(Strings.NAME, Strings.class);
 	this.arg = arg;
@@ -43,7 +47,8 @@ class App extends AppBase<Strings>
     {
 	if (arg != null && !arg.isEmpty())
 	    load(arg);
-	return null;
+	this.mainLayout = new MainLayout(this);
+	return mainLayout.getAreaLayout();
     }
 
     private void  load(String file)
@@ -64,5 +69,19 @@ class App extends AppBase<Strings>
 	    luwrain.onAreaNewContent(area);
 	}
 	*/
+    }
+
+    private ViewPdf createPdfView()
+    {
+	return new ViewPdf(getLuwrain()){
+	    @Override void inaccessible() {  getLuwrain().playSound(Sounds.ERROR); }
+	    @Override void announcePage(int pageNum, int pageCount) { message("Страница " + pageNum, Luwrain.MessageType.OK); }
+	    @Override void announceMoveLeft() {}
+	    @Override void announceMoveRight() {}
+	    @Override void announceMoveUp() {}
+	    @Override void announceMoveDown() {}
+	    @Override void announceZoomIn() {}
+	    @Override void announceZoomOut() {}
+	};
     }
 }
