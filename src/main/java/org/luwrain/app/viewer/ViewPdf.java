@@ -1,6 +1,5 @@
 /*
    Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
-   Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
 
@@ -17,11 +16,11 @@
 
 package org.luwrain.app.viewer;
 
-import java.awt.Rectangle;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import javafx.scene.paint.Color;
 import javafx.scene.image.Image;
