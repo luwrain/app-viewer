@@ -20,6 +20,7 @@ import java.util.*;
 
 import org.luwrain.core.*;
 import org.luwrain.cpanel.*;
+import org.luwrain.i18n.*;
 
 public final class Extension extends EmptyExtension
 {
@@ -31,12 +32,10 @@ public final class Extension extends EmptyExtension
     @Override public ExtensionObject[] getExtObjects(Luwrain luwrain)
     {
 	return new ExtensionObject[]{
-
 	    new Shortcut() {
 		@Override public String getExtObjName() { return "viewer"; }
 		@Override public Application[] prepareApp(String[] args)
 		{
-		    NullCheck.notNullItems(args, "args");
 		    if (args.length == 0)
 			return new Application[]{new App()};
 		    final List<Application> v = new ArrayList();
@@ -47,7 +46,20 @@ public final class Extension extends EmptyExtension
 		    return v.toArray(new Application[v.size()]);
 		}
 	    },
-
 	};
+    }
+
+    @Override public void i18nExtension(Luwrain luwrain, org.luwrain.i18n.I18nExtension i18nExt)
+    {
+	i18nExt.addCommandTitle(Lang.EN, "viewer", "Graphical preview");
+	i18nExt.addCommandTitle(Lang.RU, "preview", "Графический просмотр");
+	try {
+	    i18nExt.addStrings(Lang.EN, Strings.NAME, new ResourceStringsObj(luwrain, getClass().getClassLoader(), getClass(), "strings.properties").create(Lang.EN, Strings.class));
+	    i18nExt.addStrings(Lang.RU, Strings.NAME, new ResourceStringsObj(luwrain, getClass().getClassLoader(), getClass(), "strings.properties").create(Lang.RU, Strings.class));
+	}
+	catch(java.io.IOException e)
+	{
+	    throw new RuntimeException(e);
+	}
     }
 }

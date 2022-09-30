@@ -26,6 +26,8 @@ import org.luwrain.controls.*;
 import org.luwrain.app.base.*;
 import org.luwrain.util.*;
 
+import static org.luwrain.util.UrlUtils.*;
+
 public class App extends AppBase<Strings>
 {
     static final String
@@ -45,37 +47,30 @@ public class App extends AppBase<Strings>
 
     @Override protected AreaLayout onAppInit() throws IOException
     {
+	final File file;
 	if (arg != null && !arg.isEmpty())
-	    load(arg);
-	final ViewPdf viewPdf = createPdfView();
-	viewPdf.show();
+	    file = urlToFile(arg); else
+	    file = null;
+	if (file != null && file.getName().toUpperCase().endsWith(".PDF"))
+	{
+	    final ViewPdf viewPdf = createPdfView(file);
+	    viewPdf.show();
+	    setAppName(file.getName());
+	} else
+	    setAppName(getStrings().appName());
 	this.mainLayout = new MainLayout(this);
 	return mainLayout.getAreaLayout();
     }
 
-    private void  load(String file)
+    @Override public boolean onEscape()
     {
-	/*
-	NullCheck.notEmpty(file, "file");
-	try {
-	    		this.url = new URL(file);
-	}
-	catch(Exception e)
-	{
-	    this.text = new String[]{
-		"",
-		"ERROR:",
-		e.getClass().getName(),
-		e.getMessage(),
-	    };
-	    luwrain.onAreaNewContent(area);
-	}
-	*/
+	closeApp();
+	return true;
     }
 
-    private ViewPdf createPdfView() throws IOException
+    private ViewPdf createPdfView(File file) throws IOException
     {
-	return new ViewPdf(getLuwrain()){
+	return new ViewPdf(getLuwrain(), file){
 	    @Override void inaccessible() {  getLuwrain().playSound(Sounds.ERROR); }
 	    @Override void announcePage(int pageNum, int pageCount) { message("Страница " + pageNum, Luwrain.MessageType.OK); }
 	    @Override void announceMoveLeft() {}

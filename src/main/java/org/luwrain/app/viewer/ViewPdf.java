@@ -58,38 +58,37 @@ abstract class ViewPdf
     private double offsetX = 0;
     private double offsetY = 0;
 
-    ViewPdf(Luwrain luwrain) throws IOException
+    ViewPdf(Luwrain luwrain, File file) throws IOException
     {
 	this.luwrain = luwrain;
-	this.doc = PDDocument.load(new File("/tmp/proba.pdf"));
+	this.doc = PDDocument.load(file);
 	this.rend = new PDFRenderer(doc);
-	Log.debug(LOG_COMPONENT, "PDF renderer created");
     }
 
-        abstract void inaccessible();
+    abstract void inaccessible();
     abstract void announcePage(int pageNum, int pageCount);
     abstract void announceMoveLeft();
-        abstract void announceMoveRight();
+    abstract void announceMoveRight();
     abstract void announceMoveUp();
-        abstract void announceMoveDown();
+    abstract void announceMoveDown();
     abstract void announceZoomIn();
     abstract void announceZoomOut();
 
     void show()
     {
-	luwrain.showGraphical((control)->{
-	try {
-	    this.canvas = new ResizableCanvas();
-	    this.canvas.setOnKeyPressed((event)->onKey(event));
-	    this.canvas.setVisible(true);
+	luwrain.showGraphical((graphicalModeControl)->{
+		try {
+		    this.canvas = new ResizableCanvas();
+		    this.canvas.setOnKeyPressed((event)->onKey(graphicalModeControl, event));
+		    this.canvas.setVisible(true);
 	    	    this.canvas.requestFocus();
-		    	    drawInitial();
-	    return canvas;
-	}
-	catch(Throwable e)
-	{
-	    throw new RuntimeException(e);
-	}
+		    drawInitial();
+		    return canvas;
+		}
+		catch(Throwable e)
+		{
+		    throw new RuntimeException(e);
+		}
 	    });
     }
 
@@ -169,10 +168,8 @@ announceZoomIn();
     {
 	this.offsetX = 0;
 	this.offsetY = 0;
-	Log.debug(LOG_COMPONENT, "canvas " + String.format("%.2f", canvas.getWidth()) + "x" + String.format("%.2f", canvas.getHeight()));
 	this.image = makeImage(pageNum, 1);
 	this.scale = (float)matchingScale(image.getWidth(), image.getHeight(), canvas.getWidth(), canvas.getHeight());
-	Log.debug(LOG_COMPONENT, "initial scale is " + String.format("%.2f", scale));
 	this.image = makeImage(pageNum, scale);
 	draw();
     }
@@ -298,14 +295,13 @@ Log.debug(LOG_COMPONENT, "image " + String.format("%.2f", image.getWidth()) + "x
 return image;
     }
 
-    private void onKey(KeyEvent event)
+    private void onKey(Interaction.GraphicalModeControl graphicalModeControl, KeyEvent event)
     {
-	NullCheck.notNull(event, "event");
 	FxThread.ensure();
 	switch(event.getCode())
 	{
 	case ESCAPE:
-	    close();
+	    graphicalModeControl.close();
 	    break;
 	case PAGE_DOWN:
 	    //	    listener.onInputEvent(new InputEvent(InputEvent.Special.PAGE_DOWN));
