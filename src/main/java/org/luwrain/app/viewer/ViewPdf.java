@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2023 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -182,7 +182,7 @@ announceZoomIn();
 	    });
     }
 
-    public boolean showPage(int index)
+    private boolean showPage(int index)
     {
 	if (index < 0 || index >= getPageCount())
 	    return false;
@@ -193,7 +193,7 @@ announceZoomIn();
 	return false;
     }
 
-    int getPageCount()
+    private int getPageCount()
     {
 	return doc.getNumberOfPages();
     }
@@ -304,16 +304,16 @@ return image;
 	    graphicalModeControl.close();
 	    break;
 	case PAGE_DOWN:
-	    //	    listener.onInputEvent(new InputEvent(InputEvent.Special.PAGE_DOWN));
-	    	    break;
+	    nextPage();
+			    	    	    break;
 	case PAGE_UP:
-	    //	    	    listener.onInputEvent(new InputEvent(InputEvent.Special.PAGE_UP));
+	    prevPage();
 		    	    break;
 	case HOME:
-	    //	    	    listener.onInputEvent(new InputEvent(InputEvent.Special.HOME));
+	    showPage(0);
 		    	    break;
 	case END:
-	    //	    	    listener.onInputEvent(new InputEvent(InputEvent.Special.END));
+	    showPage(getPageCount() - 1);
 		    	    break;
 	case DOWN:
 	    //	    	    listener.onInputEvent(new InputEvent(InputEvent.Special.ARROW_DOWN));

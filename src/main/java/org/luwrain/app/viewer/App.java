@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2023 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -71,8 +71,8 @@ public class App extends AppBase<Strings>
     private ViewPdf createPdfView(File file) throws IOException
     {
 	return new ViewPdf(getLuwrain(), file){
-	    @Override void inaccessible() {  getLuwrain().playSound(Sounds.ERROR); }
-	    @Override void announcePage(int pageNum, int pageCount) { message("Страница " + pageNum, Luwrain.MessageType.OK); }
+	    @Override void inaccessible() {  getLuwrain().playSound(Sounds.EVENT_NOT_PROCESSED); }
+	    @Override void announcePage(int pageNum, int pageCount) { message(getStrings().pdfPage(String.valueOf(pageNum), String.valueOf(pageCount)), Luwrain.MessageType.OK); }
 	    @Override void announceMoveLeft() {}
 	    @Override void announceMoveRight() {}
 	    @Override void announceMoveUp() {}

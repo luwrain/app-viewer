@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2023 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -22,4 +22,5 @@ public interface Strings
 	NAME = "luwrain.viewer";
 
     String appName();
-    }
+    String pdfPage(String pageNum, String pageCount);
+}
