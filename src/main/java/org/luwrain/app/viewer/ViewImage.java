@@ -31,49 +31,44 @@ import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker.State;
 import javafx.scene.input.KeyEvent;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.rendering.PDFRenderer;
-
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.graphical.*;
 
+import static org.luwrain.graphical.FxThread.*;
+
 abstract class ViewImage
 {
-    static final String LOG_COMPONENT = "pdf";
+    static final String
+	LOG_COMPONENT = "image";
         static private final float SCALE_STEP = 0.2f;
         static private final double OFFSET_STEP = 200.0;
 
     private final Luwrain luwrain;
     private ResizableCanvas canvas = null;
-        private final PDDocument doc;
-    private final PDFRenderer rend;
     private Image image = null;
 
-    private int pageNum = 0;
     private float scale = 1;
-    private double offsetX = 0;
-    private double offsetY = 0;
+    private double
+	offsetX = 0,
+	offsetY = 0;
 
-    ViewImage(Luwrain luwrain)
+    ViewImage(Luwrain luwrain, File file) throws IOException
     {
-	NullCheck.notNull(luwrain, "luwrain");
 	this.luwrain = luwrain;
-	this.doc = null;//PDDocument.load(file);
-	this.rend = new PDFRenderer(doc);
-	Log.debug(LOG_COMPONENT, "PDF renderer created");
+	try (final InputStream is = new FileInputStream(file)) {
+	this.image = new Image(is);
+	}
     }
 
-        abstract void inaccessible();
+    abstract void inaccessible();
     abstract void announcePage(int pageNum, int pageCount);
     abstract void announceMoveLeft();
-        abstract void announceMoveRight();
+    abstract void announceMoveRight();
     abstract void announceMoveUp();
-        abstract void announceMoveDown();
+    abstract void announceMoveDown();
     abstract void announceZoomIn();
     abstract void announceZoomOut();
-    
-
 
     public void show()
     {
@@ -83,19 +78,18 @@ abstract class ViewImage
 	    this.canvas.setOnKeyPressed((event)->onKey(event));
 	    this.canvas.setVisible(true);
 	    	    this.canvas.requestFocus();
-		    	    drawInitial();
+		    	    draw();
 	    return canvas;
 	}
 	catch(Throwable e)
 	{
-	    Log.error(LOG_COMPONENT, "unable to initialize the PDF preview:" + e.getClass().getName() + ":" + e.getMessage());
+	    Log.error(LOG_COMPONENT, "unable to initialize the image preview: " + e.getClass().getName() + ": " + e.getMessage());
 	    e.printStackTrace();
 	    this.canvas = null;
 	    return null;
 	}
 	    });
     }
-
 
     /*
     private void moveRight()
@@ -147,15 +141,9 @@ announceZoomIn();
     }
     */
 
-        private void drawInitial()
-    {
-	this.image = makeImage(pageNum, 1);
-	draw();
-    }
-
     public void close()
     {
-	FxThread.runSync(()->{
+	runSync(()->{
 		//		interaction.closeCanvas(this.canvas);
 		//		interaction.disableGraphicalMode();
 	    });
@@ -163,7 +151,7 @@ announceZoomIn();
 
     private void draw()
     {
-	FxThread.ensure();
+	ensure();
 	if (image == null || canvas == null)
 	    return;
 	final double imageWidth = image.getWidth();
@@ -180,27 +168,9 @@ announceZoomIn();
 		     horizFrag.to, vertFrag.to, horizFrag.size, vertFrag.size);
     }
 
-    private Image makeImage(int pageNum, float scale)
-    {
-	FxThread.ensure();
-	        final BufferedImage pageImage;
-        try {
-            pageImage = rend.renderImage(pageNum, scale);
-        }
-	catch (IOException e)
-	{
-	    Log.error(LOG_COMPONENT, "unable to render a PDf page:" + e.getClass().getName() + ":" + e.getMessage());
-	    return null;
-        }
-	final Image image = null;//SwingFXUtils.toFXImage(pageImage, null);
-Log.debug(LOG_COMPONENT, "image " + String.format("%.2f", image.getWidth()) + "x" + String.format("%.2f", image.getHeight()));
-return image;
-    }
-
     private void onKey(KeyEvent event)
     {
-	NullCheck.notNull(event, "event");
-	FxThread.ensure();
+ensure();
 	switch(event.getCode())
 	{
 	case ESCAPE:
@@ -243,19 +213,6 @@ return image;
 	}
     }
 
-    static private final class Fragment
-    {
-	final double from;
-	final double to;
-	final double size;
-	Fragment(double from, double to, double size)
-	{
-	    this.from = from;
-	    this.to = to;
-	    this.size = size;
-	}
-    }
-
     Fragment calcFragment(double imageSize, double screenSize, double offset)
     {
 	if (imageSize < screenSize)
@@ -269,4 +226,16 @@ return image;
 	final double vertScale = screenHeight / imageHeight;
 	return Math.min(horizScale, vertScale);
     }
+
+        static private final class Fragment
+    {
+	final double from, to, size;
+	Fragment(double from, double to, double size)
+	{
+	    this.from = from;
+	    this.to = to;
+	    this.size = size;
+	}
+    }
+
 }

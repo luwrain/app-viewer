@@ -57,6 +57,12 @@ public class App extends AppBase<Strings>
 	    viewPdf.show();
 	    setAppName(file.getName());
 	} else
+	    	if (file != null && file.getName().toUpperCase().endsWith(".JPG"))
+	{
+	    final ViewImage viewImage = createImageView(file);
+	    viewImage.show();
+	    setAppName(file.getName());
+	} else
 	    setAppName(getStrings().appName());
 	this.mainLayout = new MainLayout(this);
 	return mainLayout.getAreaLayout();
@@ -71,6 +77,20 @@ public class App extends AppBase<Strings>
     private ViewPdf createPdfView(File file) throws IOException
     {
 	return new ViewPdf(getLuwrain(), file){
+	    @Override void inaccessible() {  getLuwrain().playSound(Sounds.EVENT_NOT_PROCESSED); }
+	    @Override void announcePage(int pageNum, int pageCount) { message(getStrings().pdfPage(String.valueOf(pageNum), String.valueOf(pageCount)), Luwrain.MessageType.OK); }
+	    @Override void announceMoveLeft() {}
+	    @Override void announceMoveRight() {}
+	    @Override void announceMoveUp() {}
+	    @Override void announceMoveDown() {}
+	    @Override void announceZoomIn() {}
+	    @Override void announceZoomOut() {}
+	};
+    }
+
+    private ViewImage createImageView(File file) throws IOException
+    {
+	return new ViewImage(getLuwrain(), file){
 	    @Override void inaccessible() {  getLuwrain().playSound(Sounds.EVENT_NOT_PROCESSED); }
 	    @Override void announcePage(int pageNum, int pageCount) { message(getStrings().pdfPage(String.valueOf(pageNum), String.valueOf(pageCount)), Luwrain.MessageType.OK); }
 	    @Override void announceMoveLeft() {}
