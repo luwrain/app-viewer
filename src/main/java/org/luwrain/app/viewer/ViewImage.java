@@ -36,15 +36,15 @@ import org.luwrain.core.events.*;
 import org.luwrain.graphical.*;
 
 import static org.luwrain.graphical.FxThread.*;
+import static org.luwrain.app.viewer.App.*;
 
 abstract class ViewImage
 {
-    static final String
-	LOG_COMPONENT = "image";
         static private final float SCALE_STEP = 0.2f;
         static private final double OFFSET_STEP = 200.0;
 
     private final Luwrain luwrain;
+    private final File file;
     private ResizableCanvas canvas = null;
     private Image image = null;
 
@@ -56,10 +56,8 @@ abstract class ViewImage
     ViewImage(Luwrain luwrain, File file) throws IOException
     {
 	this.luwrain = luwrain;
-	try (final InputStream is = new FileInputStream(file)) {
-	this.image = new Image(is);
-	}
-    }
+	this.file = file;
+	    }
 
     abstract void inaccessible();
     abstract void announcePage(int pageNum, int pageCount);
@@ -72,13 +70,15 @@ abstract class ViewImage
 
     public void show()
     {
-	luwrain.showGraphical((control)->{
+	this.luwrain.showGraphical((graphicalModeControl)->{
 	try {
 	    this.canvas = new ResizableCanvas();
-	    this.canvas.setOnKeyPressed((event)->onKey(event));
+	    this.canvas.setOnKeyPressed((event)->onKey(graphicalModeControl, event));
 	    this.canvas.setVisible(true);
 	    	    this.canvas.requestFocus();
+		    load();
 		    	    draw();
+			    Log.debug(LOG_COMPONENT, "created the canvas for the image");
 	    return canvas;
 	}
 	catch(Throwable e)
@@ -146,7 +146,19 @@ announceZoomIn();
 	runSync(()->{
 		//		interaction.closeCanvas(this.canvas);
 		//		interaction.disableGraphicalMode();
+		
 	    });
+    }
+
+    private void load() throws IOException
+    {
+	//FIXME: Respect scale
+		final double
+	screenWidth = canvas.getWidth(),
+screenHeight = canvas.getHeight();
+		try (final BufferedInputStream is = new BufferedInputStream(new FileInputStream(this.file))) {
+		    this.image = new Image(is, screenWidth, screenHeight, true, false);
+		}
     }
 
     private void draw()
@@ -154,12 +166,14 @@ announceZoomIn();
 	ensure();
 	if (image == null || canvas == null)
 	    return;
-	final double imageWidth = image.getWidth();
-	final double imageHeight = image.getHeight();
-	final double screenWidth = canvas.getWidth();
-	final double screenHeight = canvas.getHeight();
-	final Fragment horizFrag = calcFragment(imageWidth, screenWidth, offsetX);
-	final Fragment vertFrag = calcFragment(imageHeight, screenHeight, offsetY);
+	final double
+	imageWidth = image.getWidth(),
+	imageHeight = image.getHeight(),
+	screenWidth = canvas.getWidth(),
+screenHeight = canvas.getHeight();
+	final Fragment
+	horizFrag = calcFragment(imageWidth, screenWidth, offsetX),
+vertFrag = calcFragment(imageHeight, screenHeight, offsetY);
 	final GraphicsContext gc = canvas.getGraphicsContext2D();
 	gc.setFill(Color.BLACK);
 	gc.fillRect(0, 0, screenWidth, screenHeight);
@@ -168,13 +182,13 @@ announceZoomIn();
 		     horizFrag.to, vertFrag.to, horizFrag.size, vertFrag.size);
     }
 
-    private void onKey(KeyEvent event)
+    private void onKey(Interaction.GraphicalModeControl graphicalModeControl, KeyEvent event)
     {
 ensure();
 	switch(event.getCode())
 	{
 	case ESCAPE:
-	    close();
+	    	    graphicalModeControl.close();
 	    break;
 	case PAGE_DOWN:
 	    //	    listener.onInputEvent(new InputEvent(InputEvent.Special.PAGE_DOWN));
