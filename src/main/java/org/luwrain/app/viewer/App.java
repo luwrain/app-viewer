@@ -77,7 +77,7 @@ public class App extends AppBase<Strings>
     private ViewPdf createPdfView(File file) throws IOException
     {
 	return new ViewPdf(getLuwrain(), file){
-	    @Override void inaccessible() {  getLuwrain().playSound(Sounds.EVENT_NOT_PROCESSED); }
+	    @Override void inaccessible() {  getLuwrain().playSound(Sounds.INACCESSIBLE); }
 	    @Override void announcePage(int pageNum, int pageCount) { message(getStrings().pdfPage(String.valueOf(pageNum), String.valueOf(pageCount)), Luwrain.MessageType.OK); }
 	    @Override void announceMoveLeft() {}
 	    @Override void announceMoveRight() {}
@@ -91,7 +91,7 @@ public class App extends AppBase<Strings>
     private ViewImage createImageView(File file) throws IOException
     {
 	return new ViewImage(getLuwrain(), file){
-	    @Override void inaccessible() {  getLuwrain().playSound(Sounds.EVENT_NOT_PROCESSED); }
+	    @Override void inaccessible() {  getLuwrain().playSound(Sounds.INACCESSIBLE); }
 	    @Override void announcePage(int pageNum, int pageCount) { message(getStrings().pdfPage(String.valueOf(pageNum), String.valueOf(pageCount)), Luwrain.MessageType.OK); }
 	    @Override void announceMoveLeft() {}
 	    @Override void announceMoveRight() {}
